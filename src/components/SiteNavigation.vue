@@ -9,9 +9,9 @@
                 </div>
             </RouterLink>
 
-            <div @click="toggleModal" class="flex gap-3 flex-1 justify-end">
-                <i class="fa-circle-info fa-solid text-xl hover:text-secondary duration-150 cursor-pointer"></i>
-                <i class="fa-solid fa-plus text-xl hover:text-secondary duration-150 cursor-pointer"></i>
+            <div class="flex gap-3 flex-1 justify-end">
+                <i @click="toggleModal" class="fa-circle-info fa-solid text-xl hover:text-secondary duration-150 cursor-pointer"></i>
+                <i @click="addCity" v-if="route.query.preview" class="fa-solid fa-plus text-xl hover:text-secondary duration-150 cursor-pointer"></i>
             </div>
 
             <BaseModal :modal-active="modalActive" @close="toggleModal">
@@ -26,12 +26,45 @@
 </template>
 
 <script setup>
-    import { RouterLink } from "vue-router";
+    import { RouterLink, useRouter, useRoute } from "vue-router";
+    import {uid} from "uid"
     import BaseModal from "./BaseModal.vue"
     import { ref } from "vue";
 
+    const route = useRoute();
+    const router = useRouter();
+
     const modalActive = ref(null)
-    const toggleModal = () =>{
+    const savedCity = ref([]);
+
+    const toggleModal = () => {
         modalActive.value = !modalActive.value
+    };
+
+    const addCity = () => {
+        if (localStorage.getItem("savedCities")) {
+            savedCity.value = JSON.parse(
+            localStorage.getItem("savedCities")
+            );
+        }
+
+        const locationObj = {
+            id: uid(),
+            state: route.params.state,
+            city: route.params.city,
+            coords: {
+                lat: route.query.lat,
+                lng: route.query.lng,
+            }
+        };
+
+        savedCity.value.push(locationObj)
+        localStorage.setItem('savedCities', JSON.stringify(savedCity.value))
+
+        let query = Object.assign({}, route.query)
+        delete query.preview
+        query.id = locationObj.id
+        router.replace({query})
     }
+
 </script>

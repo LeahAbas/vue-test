@@ -2,6 +2,8 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { getAddress } from "../api/requests";
+import CityList from "../components/CityList.vue"
+import CityCardSkeleton from "../components/CityCardSkeleton.vue";
 
 const router = useRouter()
 const search = ref('')
@@ -62,6 +64,15 @@ const viewLocation = (location) => {
           </li>
         </template>
       </ul>
+    </div>
+    <div class="flex flex-col gap-4">
+      <Suspense>
+        <CityList/>
+        
+        <template #fallback>
+          <CityCardSkeleton />
+        </template>
+      </Suspense>
     </div>
   </main>
 </template>

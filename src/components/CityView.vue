@@ -1,7 +1,8 @@
 <script setup>
     import { getWeatherReport } from "../api/requests"
-    import { useRoute } from "vue-router";
+    import { useRouter, useRoute } from "vue-router";
 
+    const router = useRouter();
     const route = useRoute();
 
     const getWeatherData = async () =>{
@@ -22,6 +23,9 @@
                 utc + 1000 * data.timezone_offset;
             });
 
+            // Delay to show loader
+            await new Promise((res) => setTimeout(res, 1000))
+
             return data;
         } catch(e){
             console.log(e)
@@ -29,6 +33,17 @@
     }
 
     const weatherReport = await getWeatherData();
+
+    const removeCity = () => {
+        const cities = JSON.parse((localStorage.getItem("savedCities")))
+        const updatedCities = cities.filter((c) => c.id !== route.query.id);
+
+        localStorage.setItem("savedCities", JSON.stringify(updatedCities));
+
+        router.push({
+            name: 'home',
+        })
+    }
 
 </script>
 
@@ -146,10 +161,10 @@
           </div>
         </div>
       </div>
-    </div>
+        </div>
+
+        <div @click="removeCity" class="flex items-center gap-2 py-12 text-white cursor-pointer duration-150 hover:text-red-500">
+            <i class="fa-solid fa-trash"></i>
+        </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-
-</style>
