@@ -1,5 +1,5 @@
 <template>
-    <p v-if="savedCity.length" class="text-[0.9rem] md:text-[1.1rem] text-white mb-[-1.5rem]">Your previous search result(s)</p>
+    <p v-if="savedCity.length" class="text-[0.8rem] md:text-[1rem] text-white mb-[-1.2rem] md:mb-[-1.5rem]">Your previous search result(s)</p>
     <p v-else class="text-white text-[0.875rem] md:text-[1rem] px-3">
         No locations added. Search to add a location.
     </p>
@@ -30,7 +30,7 @@ const getCities = async () => {
         const requests = [];
         savedCity.value.forEach((city) => {
             requests.push(weatherApi.get(
-                `data/2.5/weather?lat=${city.coords.lat}&lon=${city.coords.lng}&appid=${apiKey}&units=imperial`
+                `data/2.5/weather?lat=${city.coords.lat}&lon=${city.coords.lng}&appid=${apiKey}&units=metric`
             ));
         });
 

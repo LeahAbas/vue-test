@@ -26,6 +26,11 @@ export const getPastWeather = async (lat, lon, dt) =>{
 }
 
 export const getAddress = async (searchQuery) => {
-    const {data}= await locationApi.get(`mapbox.places/${searchQuery}.json?access_token=${addressKey}&types=place`)
+    const {data}= await locationApi.get(`geocoding/v5/mapbox.places/${searchQuery}.json?access_token=${addressKey}&types=place`)
+    return data;
+}
+
+export const getLocation = async (lat, lon) => {
+    const {data}= await locationApi.get(`search/searchbox/v1/reverse?longitude=${lon}&latitude=${lat}&access_token=${addressKey}&types=place`)
     return data;
 }

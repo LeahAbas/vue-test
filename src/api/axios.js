@@ -9,7 +9,7 @@ export const weatherApi = axios.create({
 })
 
 export const locationApi = axios.create({
-    baseURL: 'https://api.mapbox.com/geocoding/v5/',
+    baseURL: 'https://api.mapbox.com/',
     timeout: 20000,
     headers: {
         "Content-Type": "application/json",

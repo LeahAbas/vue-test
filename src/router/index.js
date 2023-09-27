@@ -25,11 +25,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  document.title = `${
-    to.params.state
-      ? `${to.params.city}, ${to.params.state}`
-      : to.meta.title
-  } | The Local Weather`;
+  document.title = 'Weather Advisor';
   next();
 });
 

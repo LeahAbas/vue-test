@@ -71,10 +71,10 @@ import dayjs from "dayjs"
 </script>
 
 <template>
-    <div class="min-h-screen flex justify-center text-[0.875rem] md:text-[1rem] pt-[5rem]">
+    <div class="min-h-screen flex justify-center text-[0.875rem] md:text-[1rem] pt-[4rem] md:pt-[5rem]">
         <div class="w-[90%] md:w-[40rem] pb-[3rem] flex flex-col items-center">
             <RouterLink :to="{name: 'home'}">
-                <i class="fa-solid fa-arrow-left fa-xl text-white fixed top-[5%] z-[50] left-[3%] cursor-pointer"></i>
+                <i class="fa-solid fa-arrow-left fa-xl text-white fixed top-[5%] z-[50] md:left-[3%] right-[10%] md:right-0 cursor-pointer"></i>
             </RouterLink>
             
             <div class="text-center mt-[1.5rem] md:mt-[3rem]">
