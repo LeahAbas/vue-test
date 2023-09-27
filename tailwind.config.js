@@ -4,20 +4,14 @@ module.exports = {
   content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      backgroundImage: {
+        "hero-image": "url('/src/assets/images/heroBg.jpg')",
+      },
       colors: {
-        "primary": "#00668A",
-        "secondary": "#004E71",
-      }
-    },
-    fontFamily: {
-      Roboto: ["Roboto, sans-serif"],
-    },
-    container: {
-      padding: "2rem",
-      center: true,
+        accentColor: "#F84D4D"
+      },
     },
     screens: {
-      sm: "640px",
       md: "768px",
     }
   },

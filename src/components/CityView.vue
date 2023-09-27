@@ -1,170 +1,160 @@
 <script setup>
-    import { getWeatherReport } from "../api/requests"
-    import { useRouter, useRoute } from "vue-router";
+import { ref } from "vue";
+import { getWeatherReport, getCityWeather, getPastWeather } from "../api/requests"
+import { useRoute } from "vue-router";
+import dayjs from "dayjs"
 
-    const router = useRouter();
     const route = useRoute();
+    const showDetails = ref(false)
+    const currentDate = dayjs()
+    const timestamps = []
 
-    const getWeatherData = async () =>{
-        try{
-            const data = await getWeatherReport(route.query.lat, route.query.lng)
+    for (let i = 1; i <= 5; i++) {
+        const previousDate = currentDate.subtract(i, 'day');
+        const unixTimestamp = previousDate.unix();
+        timestamps.push(unixTimestamp);
+    }
 
-            // cal current date & time
-            const localOffset = new Date().getTimezoneOffset() * 60000;
-            const utc = data.current.dt * 1000 + localOffset;
-            
-            data.currentTime =
-            utc + 1000 * data.timezone_offset;
+    const getWeatherData = async () => {
+        try {
+            const [weather, temp] = await Promise.all([
+                getWeatherReport(route.query.lat, route.query.lng),
+                getCityWeather(route.query.lat, route.query.lng)
+            ]);
 
-            // cal hourly weather offset
-            data.hourly.forEach((hour) => {
-            const utc = hour.dt * 1000 + localOffset;
-            hour.currentTime =
-                utc + 1000 * data.timezone_offset;
-            });
-
-            // Delay to show loader
-            await new Promise((res) => setTimeout(res, 1000))
-
-            return data;
-        } catch(e){
-            console.log(e)
+            return { weather, temp };
+        } catch (e) {
+            console.log(e);
         }
+    };
+
+    const getPastReport = async () => {
+        
+        try {
+           const req = timestamps.map((stamp) => {
+               return getPastWeather(route.query.lat, route.query.lng, stamp)
+           })
+
+            const responses = await Promise.all(req)
+            
+            return responses
+       } catch (e){
+            console.log(e);
+       }
     }
 
-    const weatherReport = await getWeatherData();
+    const pastReport = await getPastReport()
+    const data  = await getWeatherData();
+    const weatherReport = data.weather
+    const weatherTemp = data.temp
 
-    const removeCity = () => {
-        const cities = JSON.parse((localStorage.getItem("savedCities")))
-        const updatedCities = cities.filter((c) => c.id !== route.query.id);
 
-        localStorage.setItem("savedCities", JSON.stringify(updatedCities));
-
-        router.push({
-            name: 'home',
-        })
+    const details = [
+    {
+        title: "Wind Speed",
+        value: `${Math.round(weatherReport.current.wind_speed)} metre/sec`,
+    },
+    {
+        title: "Humidity",
+        value: `${weatherReport.current.humidity}%`,
+    },
+    {
+        title: "Pressure",
+        value: `${weatherReport.current.pressure} hPa`,
+    },
+    {
+        title: "Sunrise/Sunset Time",
+        value: `${dayjs.unix(weatherReport.current.sunrise).format("h:mm A")} / ${dayjs.unix(weatherReport.current.sunset).format("h:mm A")}`,
     }
+]
 
 </script>
 
 <template>
-    <div class="flex flex-col flex-1 items-center">
+    <div class="min-h-screen flex justify-center text-[0.875rem] md:text-[1rem] pt-[5rem]">
+        <div class="w-[90%] md:w-[40rem] pb-[3rem] flex flex-col items-center">
+            <RouterLink :to="{name: 'home'}">
+                <i class="fa-solid fa-arrow-left fa-xl text-white fixed top-[5%] z-[50] left-[3%] cursor-pointer"></i>
+            </RouterLink>
+            
+            <div class="text-center mt-[1.5rem] md:mt-[3rem]">
+                <p> 
+                    {{ dayjs(weatherReport.currentTime).format("dddd, MMMM D, YYYY h:mm A") }}
+                </p>
+                <p class="font-semibold">{{ weatherTemp.name }}, {{ weatherTemp.sys.country }}</p>
+            </div>
 
-        <!-- Banner -->
-        <div v-if="route.query.preview" class="text-white p-4 bg-secondary w-full text-center">
-            <p>You are viewing the city. Click "+" icon to start tracking this city</p>
-        </div>
+            <h1 class="font-semibold text-[4.375rem] md:text-[5.5rem] mt-[1.5rem]">{{ Math.round(weatherReport.current.temp) }}<sup>o</sup>C</h1>
 
-        <!-- Weather Overview -->
-        <div class="flex flex-col text-white py-12 items-center">
-            <h1 class="text-4xl mb-2">{{ route.query.city }}</h1>
-            <p class="text-sm mb-12">
-                {{
-                new Date(weatherReport.currentTime).toLocaleDateString(
-                    "en-us",
-                    {
-                    weekday: "short",
-                    day: "2-digit",
-                    month: "long",
-                    }
-                )
-                }}
-                {{
-                new Date(weatherReport.currentTime).toLocaleTimeString(
-                    "en-us",
-                    {
-                    timeStyle: "short",
-                    }
-                )
-                }}
-            </p>
-            <p class="text-8xl mb-8">
-                {{ Math.round(weatherReport.current.temp) }}&deg;
-            </p>
-            <p>
-                Feels like
-                {{ Math.round(weatherReport.current.feels_like) }} &deg;
-            </p>
-            <p class="capitalize">
-                {{ weatherReport.current.weather[0].description }}
-            </p>
-            <img
-                class="w-[150px] h-auto"
-                :src="
-                `http://openweathermap.org/img/wn/${weatherReport.current.weather[0].icon}@2x.png`
-                "
-                alt="weather"
-            />
+            <div class="text-center flex flex-col items-center">
+                <p class="font-semibold text-accentColor mb-1 capitalize">{{ weatherReport.current.weather[0].description }}</p>
+                <div class="flex items-center justify-center h-[2.8125rem] w-[2.8125rem] md:h-[3.4375rem] md:w-[3.4375rem] rounded-full bg-accentColor drop-shadow-[2px_2px_10px_rgba(0,0,0,0.2)]">
+                <img
+                    class="h-[3rem] object-cover"
+                    :src="
+                    `http://openweathermap.org/img/wn/${weatherReport.current.weather[0].icon}@2x.png`
+                    "
+                    alt="weather"
+                    />
+                </div>
+            </div>
 
-        </div>
+            <div class="flex items-center gap-[1.25rem] mt-[1.5rem] md:mt-[2.5rem]">
+                <span>Today’s High: {{ Math.round(weatherTemp.main.temp_max) }}<sup>o</sup>C</span>
+                <span>Today’s Low: {{ Math.round(weatherTemp.main.temp_min) }}<sup>o</sup>C</span>
+            </div>
 
-        <hr class="border-white border-opacity-10 border w-full" />
+            <button @click="showDetails=!showDetails" class="text-white bg-black rounded-[0.5rem] h-[2.5rem] w-[7.5rem] mt-[0.94rem] text-[0.785rem] md:text-[0.875rem]">{{showDetails ? "Hide" : "View more"}}</button>
 
-        <!-- Hourly Weather -->
-        <div class="max-w-screen w-full my-12">
-            <div class="mx-8 text-white">
-                <h2 class="mb-4">
-                    Hourly Weather
-                </h2>
-                <div class="flex gap-10 overflow-x-scroll">
-                    <div v-for="hour in weatherReport.hourly" :key="hour.dt" class="flex flex-col gap-4 items-center">
-                    <p class="whitespace-wrap text-md">{{ 
-                        new Date(hour.currentTime).toLocaleTimeString("en-us", {
-                            hour: "numeric",
-                        })
-                        }}
-                    </p>
-                    <img
-                        class="w-auto h-[50px] object-cover"
-                        :src="
-                            `http://openweathermap.org/img/wn/${hour.weather[0].icon}@2x.png`
-                        "
-                        alt="hourly-weather"
-                        />
-                        <p class="text-xl">
-                        {{ Math.round(hour.temp) }}&deg;
-                        </p>
+            <Transition name="details">
+                <ul v-if="showDetails" class="flex justify-between flex-wrap px-[1.5rem] h-[10rem] md:h-[4.5rem] w-full rounded-[0.5rem] bg-[rgba(201,201,201,0.45)] shadow-[0px_2px_15px_0px_rgba(0,0,0,0.10)] mt-[2.1rem]">
+                    <li v-for="(item, index) in details" :key="index" class="flex flex-col items-center justify-center">
+                        <p>{{ item.title }}</p>
+                        <h3 class="font-semibold mt-1">{{ item.value }}</h3>
+                    </li>
+                </ul>
+            </Transition>
+
+            <div class="flex flex-col md:flex-row justify-between w-full mt-[2.5rem]">
+                <div class="w-full md:w-[48%] mb-[1.5rem] md:mb-0 rounded-[0.5rem] bg-[rgba(201,201,201,0.45)] shadow-[0px_2px_15px_0px_rgba(0,0,0,0.10)] p-[1rem]">
+                    <h4 class="text-center text-[1rem] md:text-[1.25rem] mb-[0.8rem] md:mb-[1rem]  font-medium">Forcast</h4>
+
+                    <div v-for="item in weatherReport.daily" :key="item.dt" class="mb-2">
+                        <div class="flex justify-between">
+                            <p >{{ dayjs.unix(item.dt).format("dddd") }}</p>
+                            <span class="text-accentColor">H:{{ Math.round(item.temp.max) }}<sup>o</sup>C  L:{{ Math.round(item.temp.min) }}<sup>o</sup>C</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-[48%] rounded-[0.5rem] bg-[rgba(201,201,201,0.45)] shadow-[0px_2px_15px_0px_rgba(0,0,0,0.10)] p-[1rem]">
+                    <h4 class="text-center mb-[0.8rem] md:mb-[1rem] text-[1rem] md:text-[1.25rem] font-medium">Past 5 Days</h4>
+
+                    <div v-for="item in pastReport" :key="item.current.dt" class="mb-3">
+                        <div class="flex justify-between">
+                            <p>{{ dayjs.unix(item.current.dt).format("dddd") }}</p>
+                            <span class="text-accentColor"> {{ Math.round(item.current.temp) }} <sup>o</sup>C</span>
+                        </div>
+                       
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Weekly Weather -->
-        <div class="max-w-screen-md w-full py-12">
-        <div class="mx-8 text-white">
-            <h2 class="mb-4">7 Day Forecast</h2>
-            <div
-            v-for="day in weatherReport.daily"
-            :key="day.dt"
-            class="flex items-center"
-            >
-            <p class="flex-1">
-                {{
-                new Date(day.dt * 1000).toLocaleDateString(
-                    "en-us",
-                    {
-                    weekday: "long",
-                    }
-                )
-                }}
-            </p>
-            <img
-                class="w-[50px] h-[50px] object-cover"
-                :src="
-                `http://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png`
-                "
-                alt=""
-            />
-            <div class="flex gap-2 flex-1 justify-end">
-            <p>H: {{ Math.round(day.temp.max) }}</p>
-            <p>L: {{ Math.round(day.temp.min) }}</p>
-          </div>
-        </div>
-      </div>
-        </div>
-
-        <div @click="removeCity" class="flex items-center gap-2 py-12 text-white cursor-pointer duration-150 hover:text-red-500">
-            <i class="fa-solid fa-trash"></i>
-        </div>
-  </div>
+    </div>
 </template>
+
+<style scoped>
+.details-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.details-leave-active {
+  transition: all 0.5s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.details-enter-from,
+.details-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+</style>

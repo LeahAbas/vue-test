@@ -1,15 +1,15 @@
 <template>
-    <div class="flex flex-col flex-1">
+    <div class="flex flex-col flex-1 mt-[6rem]">
       <!-- Overview -->
       <div class="flex flex-col py-12 items-center">
-        <PageLoader  class="max-w-[300px] w-full mb-2" />
-        <PageLoader  class="max-w-[300px] w-full mb-12" />
+        <PageLoader  class="max-w-[500px] w-full mb-2" />
+        <PageLoader  class="max-w-[500px] w-full mb-12" />
         <PageLoader 
-          class="max-w-[300px] h-[100px] w-full mb-12"
+          class="max-w-[500px] h-[100px] w-full mb-12"
         />
-        <PageLoader  class="max-w-[300px] w-full mb-8" />
+        <PageLoader  class="max-w-[500px] w-full mb-8" />
         <PageLoader 
-          class="max-w-[300px] h-[75px] w-full"
+          class="max-w-[500px] h-[75px] w-full"
         />
       </div>
       <!-- Hourly -->

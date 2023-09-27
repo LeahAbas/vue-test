@@ -1,19 +1,22 @@
 <template>
+    <p v-if="savedCity.length" class="text-[0.9rem] md:text-[1.1rem] text-white mb-[-1.5rem]">Your previous search result(s)</p>
+    <p v-else class="text-white text-[0.875rem] md:text-[1rem] px-3">
+        No locations added. Search to add a location.
+    </p>
+
     <div v-for="city in savedCity" :key="city.id">
         <CityCard :city="city" @click="goToCity(city)" />
     </div>
-
-    <p v-if="savedCity.length === 0">
-        No locations added.
-    </p>
 </template>
 
 <script setup>
 import CityCard from './CityCard.vue'
 import { ref } from "vue"
-import axios from "axios"
 import { useRouter } from "vue-router";
+import { weatherApi } from "../api/axios"
+
 const apiKey = import.meta.env.VITE_WEATHER_API
+
 
 const router = useRouter()
 const savedCity = ref([])
@@ -26,14 +29,13 @@ const getCities = async () => {
 
         const requests = [];
         savedCity.value.forEach((city) => {
-            requests.push(axios.get(
-                `https://api.openweathermap.org/data/2.5/weather?lat=${city.coords.lat}&lon=${city.coords.lng}&appid=${apiKey}&units=imperial`
+            requests.push(weatherApi.get(
+                `data/2.5/weather?lat=${city.coords.lat}&lon=${city.coords.lng}&appid=${apiKey}&units=imperial`
             ));
         });
 
         const weatherData = await Promise.all(requests);
 
-        // Delay to show loader
         await new Promise((res) => setTimeout(res, 1000))
 
         weatherData.forEach((value, index) => {
