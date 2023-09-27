@@ -1,6 +1,6 @@
 
 <template>
-    <header class="fixed top-0 left-0 w-full bg-black text-white z-[30] h-[4rem] md:h-[5.6rem] flex items-center justify-center">
+    <header class="fixed top-0 left-0 w-full bg-black text-white z-[30] h-[4.5rem] md:h-[5.6rem] flex items-center justify-center">
         <nav class="flex item-center justify-between w-[33rem]">
             <RouterLink :to="{name: 'home'}">
                 <div class="flex gap-3 items-end px-[1rem] md:px-0">
