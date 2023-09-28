@@ -48,7 +48,6 @@ import dayjs from "dayjs"
     const weatherReport = data.weather
     const weatherTemp = data.temp
 
-
     const details = [
     {
         title: "Wind Speed",
@@ -79,7 +78,7 @@ import dayjs from "dayjs"
             
             <div class="text-center mt-[1.5rem] md:mt-[3rem]">
                 <p> 
-                    {{ dayjs(weatherReport.currentTime).format("dddd, MMMM D, YYYY h:mm A") }}
+                    {{ dayjs().format("dddd, MMMM D, YYYY h:mm A") }}
                 </p>
                 <p class="font-semibold">{{ weatherTemp.name }}, {{ weatherTemp.sys.country }}</p>
             </div>
