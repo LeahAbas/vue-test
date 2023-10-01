@@ -3,11 +3,11 @@ import { ref, onMounted } from "vue";
 import {uid} from "uid"
 import { useRouter} from "vue-router";
 import { getAddress, getLocation } from "../api/requests";
-import {useToast} from 'vue-toast-notification';
+import { useToast } from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import debounce from 'lodash/debounce';
-import CityList from "../components/CityList.vue"
 import CityCardSkeleton from "../components/CityCardSkeleton.vue";
+import CityList from "../components/CityList.vue"
 
 
 const router = useRouter()
@@ -104,34 +104,31 @@ const viewLocation = (location) => {
 </script>
 
 <template>
-  <main class="h-[calc(100vh-4rem)] md:h-[calc(100vh-5.6rem)] bg-hero-image bg-cover">
-    <div class="h-full w-full bg-[rgba(0,0,0,0.65)] backdrop-blur-[5px] flex flex-col items-center pt-[6.5rem] md:pt-[8rem] px-[25px] md:px-0">
-      <div class="relative w-full md:w-[33rem] h-[65vh] flex flex-col gap-[1.2rem] md:gap-[2rem] rounded-[2rem] md:rounded-[2.5rem] bg-[rgba(255,255,255,0.08)] backdrop-blur-[20px] p-[1.5rem] md:p-[2rem]">
-        <div class="border border-transparent focus-within:border-accentColor h-[3rem] md:h-[3.125rem] w-full rounded-[3.125rem] bg-[rgba(255,255,255,0.50)] flex items-center justify-between px-[0.5rem] md:px-[0.94rem] shadow-[0px_2px_10px_0px_rgba(0,0,0,0.15)] backdrop-blur-[2.5px]">
-          <input class="h-[70%] w-[80%] outline-none border-0 text-[0.875rem] md:text-[1rem] text-black bg-transparent pl-[0.7rem] md:pl-[1rem] placeholder:text-black" type="text" @input="debouncedSearch" v-model="search" autofocus placeholder="Enter a city name"/>
-          <span class="h-[1.8rem] w-[1.8rem] md:h-[2.1875rem] md:w-[2.1875rem] rounded-full bg-accentColor flex items-center justify-center">
-            <i class="fa-solid fa-magnifying-glass text-white text-[0.7rem] md:text-[1rem]"></i>
+  <main class="home">
+    <div class="home-container">
+      <div class="home-box">
+        <div class="home-input-container">
+          <input type="text" @input="debouncedSearch" v-model="search" autofocus placeholder="Enter a city name"/>
+          <span>
+            <i class="fa-solid fa-magnifying-glass"></i>
           </span>
+
+          <ul v-if="mapboxResult">
+            <p v-if="searchError">Failed, Please try again.</p>
+            <p v-if="mapboxResult.length === 0  && !searchError">No result found</p>
+
+            <template v-else>
+              <li 
+                v-for="item in mapboxResult" :key="item.id"
+                @click="viewLocation(item)" 
+                >
+                {{  item.place_name }}
+              </li>
+            </template>
+          </ul>
         </div>
-   
-
-        <ul v-if="mapboxResult" class="z-[10] w-[88%] px-4 py-2 absolute top-[19%] md:top-[18%] left-[6%] rounded-[10px] bg-white shadow-xl">
-          <p v-if="searchError">Failed, Please try again.</p>
-          <p v-if="mapboxResult.length === 0  && !searchError" class="text-accentColor">No result found</p>
-
-          <template v-else>
-            <li 
-              v-for="item in mapboxResult" :key="item.id"
-              class="py-[0.4rem] md:py-[0.5rem] cursor-pointer hover:text-accentColor text-[0.875rem] md:text-[1rem]" 
-              @click="viewLocation(item)" 
-              >
-              {{  item.place_name }}
-            </li>
-          </template>
-        </ul>
-
         
-        <div class="w-full h-[80%] flex flex-col gap-[1.5rem] md:gap-[1.8rem] overflow-y-auto">
+        <div class="home-city-list">
           <Suspense>
             <CityList/>
             
@@ -144,3 +141,165 @@ const viewLocation = (location) => {
     </div>
   </main>
 </template>
+
+<style lang="scss" scoped>
+  .home{
+    height: 100vh;
+    background-image: url('../assets/images/heroBg.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+    &-container {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 7rem 20px;
+      background-color: rgba(0, 0, 0, 0.3); 
+      backdrop-filter: 5px;
+      backdrop-filter: blur(5px);
+    }
+
+    &-box {
+      width: 100%;
+      height: 65vh;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      border-radius: 2rem;
+      background-color: rgba(255, 255, 255, 0.439);
+      backdrop-filter: blur(20px);
+      padding: 1rem;
+    }
+
+    &-input-container {
+      position: relative;
+      height: 3rem;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 3.125rem;
+      background-color: rgba(255, 255, 255, 0.50);
+      padding: 0 0.4rem;
+      box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(2.5px);
+      z-index: 5;
+      
+      input {
+        height: 70%;
+        width: 80%;
+        outline: none;
+        border: 0;
+        font-size: 0.875rem;
+        color: black;
+        background-color: transparent;
+        padding-left: 0.7rem;
+
+        &::placeholder{
+          color: rgba(0, 0, 0, 0.684)
+        }
+      }
+
+      span {
+        height: 2rem;
+        width: 2rem;
+        border-radius: 50%;
+        color: white;
+        background-color: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+      }
+
+      ul {
+        position: absolute;
+        top: 115%;
+        left: 0;
+        border-radius: 20px;
+        background-color: white;
+        width: 100%;
+        padding: 16px 24px;
+        border: 1px solid black;
+        box-shadow: 0 1px 20px #000000ad;
+        
+        p {
+          color: var(--accent-color);
+        }
+        
+        li {
+          font-size: 0.875rem;
+          padding: 0.4rem 0;
+          cursor: pointer; 
+
+          &:hover {
+            color: var(--accent-color);
+          }
+        }
+      }
+
+      &:focus-within {
+        box-shadow: 0 0 10px #f84d4dce;
+      }
+    }
+
+    &-city-list {
+      width: 100%;
+      height: 82%;
+      display: flex;
+      flex-direction: column;
+      font-size: 0.875rem;
+      overflow-y: auto;
+    }
+    
+    @media screen and (min-width: 768px){
+      &-container {
+        padding: 10rem 0;
+      }
+
+      &-box {
+        width: 33rem;
+        border-radius: 2.5rem;
+        padding: 2rem;
+      }
+
+      &-input-container {
+        height: 3.125rem;
+        padding: 0 0.5rem;
+
+        input {
+          font-size: 1rem;
+          padding-left: 1rem;
+        }
+
+        span {
+          height: 2.3rem;
+          width: 2.3rem;
+          font-size: 1rem;
+        }
+
+        ul {
+          li {
+            padding: 0.5rem 0;
+            font-size: 1rem;
+          }
+        }
+      }
+
+      &-city-list {
+        font-size: 1rem;
+      }
+    }
+
+    @media screen  and (min-width: 1024px){
+      &-box {
+        gap: 0;
+        justify-content: space-between;
+      }
+    }
+  }
+
+</style>

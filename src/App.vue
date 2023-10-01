@@ -12,9 +12,9 @@
 </template>
 
 <script setup>
-import { RouterView } from "vue-router";
-import SiteNavigation from "./components/SiteNavigation.vue"
-import BaseFooter from "./components/BaseFooter.vue"
+  import { RouterView } from "vue-router";
+  import SiteNavigation from "./components/SiteNavigation.vue"
+  import BaseFooter from "./components/BaseFooter.vue"
 </script>
 
 <style>

@@ -70,79 +70,259 @@ import dayjs from "dayjs"
 </script>
 
 <template>
-    <div class="min-h-screen flex justify-center text-[0.875rem] md:text-[1rem] pt-[4.5rem] md:pt-[5rem]">
-        <div class="w-[90%] md:w-[40rem] pb-[3rem] flex flex-col items-center">
-            <RouterLink :to="{name: 'home'}">
-                <i class="fa-solid fa-arrow-left fa-xl text-white fixed top-[5%] z-[50] md:left-[3%] right-[10%] md:right-0 cursor-pointer"></i>
-            </RouterLink>
-            
-            <div class="text-center mt-[1.5rem] md:mt-[3rem]">
+    <div class="city-view">
+        <div class="city-view-container">            
+            <div class="top">
                 <p> 
                     {{ dayjs().format("dddd, MMMM D, YYYY h:mm A") }}
                 </p>
-                <p class="font-semibold">{{ weatherTemp.name }}, {{ weatherTemp.sys.country }}</p>
+                <p>{{ weatherTemp.name }}, {{ weatherTemp.sys.country }}</p>
             </div>
 
-            <h1 class="font-semibold text-[4.375rem] md:text-[5.5rem] mt-[1.5rem]">{{ Math.round(weatherReport.current.temp) }}<sup>o</sup>C</h1>
+            <h1>{{ Math.round(weatherReport.current.temp) }}&deg;C</h1>
 
-            <div class="text-center flex flex-col items-center">
-                <p class="font-semibold text-accentColor mb-1 capitalize">{{ weatherReport.current.weather[0].description }}</p>
-                <div class="flex items-center justify-center h-[2.8125rem] w-[2.8125rem] md:h-[3.4375rem] md:w-[3.4375rem] rounded-full bg-accentColor drop-shadow-[2px_2px_10px_rgba(0,0,0,0.2)]">
-                <img
-                    class="h-[3rem] object-cover"
-                    :src="
-                    `http://openweathermap.org/img/wn/${weatherReport.current.weather[0].icon}@2x.png`
-                    "
-                    alt="weather"
+            <div class="desc">
+                <p>{{ weatherReport.current.weather[0].description }}</p>
+                <div class="desc-icon-box">
+                    <img
+                        :src="
+                        `http://openweathermap.org/img/wn/${weatherReport.current.weather[0].icon}@2x.png`
+                        "
+                        alt="weather"
                     />
                 </div>
             </div>
 
-            <div class="flex items-center gap-[1.25rem] mt-[1.5rem] md:mt-[2.5rem]">
-                <span>Today’s High: {{ Math.round(weatherTemp.main.temp_max) }}<sup>o</sup>C</span>
-                <span>Today’s Low: {{ Math.round(weatherTemp.main.temp_min) }}<sup>o</sup>C</span>
+            <div class="high-low">
+                <span>Today’s High: {{ Math.round(weatherTemp.main.temp_max) }}&deg;C</span>
+                <span>Today’s Low: {{ Math.round(weatherTemp.main.temp_min) }}&deg;C</span>
             </div>
 
-            <button @click="showDetails=!showDetails" class="text-white bg-black rounded-[0.5rem] h-[2.5rem] w-[7.5rem] mt-[0.94rem] text-[0.785rem] md:text-[0.875rem]">{{showDetails ? "Hide" : "View more"}}</button>
+            <button @click="showDetails = !showDetails">{{showDetails ? "Hide" : "View more"}}</button>
 
             <Transition name="details">
-                <ul v-if="showDetails" class="flex justify-between flex-wrap px-[1.5rem] h-[10rem] md:h-[4.5rem] w-full rounded-[0.5rem] bg-[rgba(201,201,201,0.45)] shadow-[0px_2px_15px_0px_rgba(0,0,0,0.10)] mt-[2.1rem]">
-                    <li v-for="(item, index) in details" :key="index" class="flex flex-col items-center justify-center">
+                <ul v-if="showDetails" class="details-box">
+                    <li v-for="(item, index) in details" :key="index">
                         <p>{{ item.title }}</p>
-                        <h3 class="font-semibold mt-1">{{ item.value }}</h3>
+                        <h3>{{ item.value }}</h3>
                     </li>
                 </ul>
             </Transition>
 
-            <div class="flex flex-col md:flex-row justify-between w-full mt-[2.5rem]">
-                <div class="w-full md:w-[48%] mb-[1.5rem] md:mb-0 rounded-[0.5rem] bg-[rgba(201,201,201,0.45)] shadow-[0px_2px_15px_0px_rgba(0,0,0,0.10)] p-[1rem]">
-                    <h4 class="text-center text-[1rem] md:text-[1.25rem] mb-[0.8rem] md:mb-[1rem]  font-medium">Forcast</h4>
+            <div class="bottom">
+                <div class="bottom-box">
+                    <h4>Forcast</h4>
 
-                    <div v-for="item in weatherReport.daily" :key="item.dt" class="mb-2">
-                        <div class="flex justify-between">
-                            <p >{{ dayjs.unix(item.dt).format("dddd") }}</p>
-                            <span class="text-accentColor">H:{{ Math.round(item.temp.max) }}<sup>o</sup>C  L:{{ Math.round(item.temp.min) }}<sup>o</sup>C</span>
-                        </div>
+                    <div v-for="item in weatherReport.daily" :key="item.dt" class="item-forcast">
+                        <p>{{ dayjs.unix(item.dt).format("dddd") }}</p>
+                        <span class="text-accentColor">
+                            H:{{ Math.round(item.temp.max) }}&deg;C 
+                                <i class="fa-solid fa-right-left fa-xs text-green-600"></i>
+                            L:{{ Math.round(item.temp.min) }}&deg;C</span>
                     </div>
                 </div>
 
-                <div class="w-full md:w-[48%] rounded-[0.5rem] bg-[rgba(201,201,201,0.45)] shadow-[0px_2px_15px_0px_rgba(0,0,0,0.10)] p-[1rem]">
-                    <h4 class="text-center mb-[0.8rem] md:mb-[1rem] text-[1rem] md:text-[1.25rem] font-medium">Past 5 Days</h4>
+                <div class="bottom-box">
+                    <h4>Past 5 Days</h4>
 
-                    <div v-for="item in pastReport" :key="item.current.dt" class="mb-3">
-                        <div class="flex justify-between">
-                            <p>{{ dayjs.unix(item.current.dt).format("dddd") }}</p>
-                            <span class="text-accentColor"> {{ Math.round(item.current.temp) }} <sup>o</sup>C</span>
-                        </div>
-                       
-                    </div>
+                    <div  v-for="item in pastReport" :key="item.current.dt" class="item-past">
+                        <p>{{ dayjs.unix(item.current.dt).format("dddd") }}</p>
+                        <span class="text-accentColor"> {{ Math.round(item.current.temp) }}&deg;C</span>
+                     </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+.city-view {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    font-size: 0.875;
+    padding-top: 7rem;
+
+    &-container {
+        width: 90%;
+        padding-bottom: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .top {
+        p:nth-Child(2){
+            font-weight: 600;
+        }
+    }
+    h1 {
+        font-weight: 600;
+        font-size: 4.375rem;
+        margin-top: 1.5rem;
+    }
+
+    .desc {
+        display: flex;
+        flex-direction: column;
+        align-items: center;  
+
+        p {
+            font-weight: 600;
+            color: var(--accentColor);
+            margin-bottom: 1rem;
+            text-transform: capitalize;
+        }
+
+        &-icon-box {
+            width: 2.85rem;
+            height: 2.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            filter: drop-shadow(2px 2px 10px rgba(0, 0, 0, 0.332));
+
+            img {
+                height: 3rem;
+                background-size: cover;
+            }
+        }
+    }
+
+    .high-low {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        margin-top: 1.5rem;
+    }
+
+    button {
+        color: white;
+        background-color: black;
+        border-radius: 0.5rem;
+        height: 2.5rem;
+        width: 7.5rem;
+        margin-top: 0.94rem;
+        font-size: 0.785rem;
+    }
+
+    .details-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        justify-content: space-between;
+        padding: 1rem 1.5rem;
+        width: 100%;
+        border-radius: 0.5rem;
+        background-color: rgba(201, 201, 201, 0.45);
+        box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.10);
+        margin-top: 2.1rem;
+
+        li {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            h3 {
+                font-weight: 600;
+                margin-top: 4px;
+            }
+        }
+    }
+
+    .bottom {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin-top: 2.5rem;
+
+        &-box {
+            width: 100%;
+            border-radius: 0.5rem;
+            background-color: rgba(201, 201, 201, 0.45);
+            box-shadow: 0px 2px 15px 0px rgba(0, 0, 0, 0.10);
+            padding: 1rem;
+
+            &:nth-child(1){
+                margin-bottom: 1.5rem;
+            }
+
+            h4 {
+                text-align: center;
+                font-weight: 500;
+                font-size: 1rem;
+                margin-bottom: 0.8rem;
+            }
+
+            .item-forcast {
+                margin-bottom: 10px;
+                display: flex;
+                justify-content: space-between;
+
+                span {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+            }
+            .item-past {
+                margin-bottom: 14px;
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+    }
+
+    @media screen and (min-width: 768px) {
+        font-size: 1rem;
+        padding-top: 8rem;
+
+        &-container {
+            width: 40rem
+        }
+
+        h1 {
+            font-size: 5.5rem;
+        }
+
+        .desc {
+            &-icon-box {
+                width: 3.5rem;
+                height: 3.5rem;
+            }
+        }
+
+        .high-low {
+            margin-top: 2.5rem;
+        }
+
+        button {
+            font-size: 0.875rem;
+        }
+
+        .bottom {
+            flex-direction: row;
+
+            &-box {
+                width: 48%;
+
+                &:nth-child(1){
+                    margin-bottom: 0;
+                }
+
+                h4 {
+                    font-size: 1.25rem;
+                    margin-bottom: 1rem;
+                }
+            }
+        }
+    }
+}
 .details-enter-active {
   transition: all 0.3s ease-out;
 }

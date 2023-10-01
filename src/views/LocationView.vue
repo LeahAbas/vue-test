@@ -2,6 +2,7 @@
     <div>
         <Suspense>
             <CityView/> 
+            
             <template #fallback>
                 <CityViewSkeleton /> 
             </template>
@@ -11,5 +12,5 @@
 
 <script setup>
     import CityView from "../components/CityView.vue";
-import CityViewSkeleton from "../components/CityViewSkeleton.vue";
+    import CityViewSkeleton from "../components/CityViewSkeleton.vue";
 </script>

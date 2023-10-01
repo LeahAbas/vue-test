@@ -1,11 +1,13 @@
 <template>
-    <p v-if="savedCity.length" class="text-[0.8rem] md:text-[1rem] text-white mb-[-1.2rem] md:mb-[-1.5rem]">Your previous search result(s)</p>
-    <p v-else class="text-white text-[0.875rem] md:text-[1rem] px-3">
+    <p v-if="savedCity.length" class="heading">Your previous search result(s)</p>
+    <p v-else>
         No locations added. Search to add a location.
     </p>
 
-    <div v-for="city in savedCity" :key="city.id">
-        <CityCard :city="city" @click="goToCity(city)" />
+    <div class="cards-container">
+        <div v-for="city in savedCity" :key="city.id" @click="goToCity(city)" class="cards-container-box">
+            <CityCard :city="city" />
+        </div>
     </div>
 </template>
 
@@ -58,3 +60,37 @@ const goToCity = (city) => {
 }
 
 </script>
+
+<style lang="scss" scoped>
+.heading {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    &-box {
+        height: 4.5rem;
+        width: 100%;
+        border-radius: 0.9375rem;
+        background-color: rgba(255, 255, 255, 0.50);
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.15);
+        backdrop-filter: blur(2.5px);
+        padding: 0.6rem 1rem;
+        cursor: pointer;
+
+        &:hover {
+            background-color: #0000000c;
+        }
+
+        @media screen and (min-width: 768px) {
+            height: 6.25rem;
+            padding: 0.8rem 1.5rem;
+        }
+    }
+
+}
+</style>
