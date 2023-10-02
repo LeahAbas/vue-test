@@ -1,5 +1,4 @@
 import { weatherApi, locationApi } from "./axios";
-
 const weatherKey = import.meta.env.VITE_WEATHER_API
 const addressKey = import.meta.env.VITE_MAPBOX_API
 

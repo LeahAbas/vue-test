@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "test": "vitest",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
@@ -21,12 +22,16 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.3.4",
+    "@vue/test-utils": "^2.4.1",
     "autoprefixer": "^10.4.16",
+    "axios-mock-adapter": "^1.22.0",
     "eslint": "^8.49.0",
     "eslint-plugin-vue": "^9.17.0",
+    "happy-dom": "^12.5.1",
     "postcss": "^8.4.30",
     "sass": "^1.68.0",
     "tailwindcss": "^3.3.3",
-    "vite": "^4.4.9"
+    "vite": "^4.4.9",
+    "vitest": "^0.34.6"
   }
 }
