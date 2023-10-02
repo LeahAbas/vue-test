@@ -139,14 +139,14 @@ const viewLocation = (location) => {
 
 <style lang="scss" scoped>
   .home{
-    height: 100vh;
+    min-height: 100vh;
     background-image: url('../assets/images/heroBg.jpg');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     
     &-container {
-      height: 100%;
+      min-height: 100vh;
       width: 100%;
       display: flex;
       flex-direction: column;
