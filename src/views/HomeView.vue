@@ -1,20 +1,21 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import {uid} from "uid"
 import { useRouter} from "vue-router";
 import { getAddress, getLocation } from "../api/requests";
 import { useToast } from 'vue-toast-notification';
+import { store } from "../store";
 import 'vue-toast-notification/dist/theme-sugar.css';
 import debounce from 'lodash/debounce';
 import CityCardSkeleton from "../components/CityCardSkeleton.vue";
 import CityList from "../components/CityList.vue"
-
 
 const router = useRouter()
 const search = ref('')
 const mapboxResult = ref(null)
 const searchError = ref(false)
 const toast = useToast();
+const savedLocations = computed(() => store.state.savedLocations)
 
 const getUserLocation = () => {
   if (navigator.geolocation) {
@@ -39,11 +40,8 @@ const getUserLocation = () => {
   }
 }
 
-
-
 onMounted(() => {
   getUserLocation()
-
 })
 
 const debouncedSearch = debounce(async () => {
@@ -60,46 +58,44 @@ const debouncedSearch = debounce(async () => {
   }
 }, 300);
 
-const addCity = (item, city, state) => {
-  let savedCity = [];
-
-    if (localStorage.getItem("savedCities")) {
-        savedCity = JSON.parse(
-        localStorage.getItem("savedCities")
-        );
-    }
-
-    const locationObj = {
-        id: uid(),
-        state: state,
-        city: city,
-        coords: {
-          lat: item.geometry.coordinates[1],
-          lng: item.geometry.coordinates[0]
-        }
-    };
-
-    const newCities = [locationObj, ...savedCity];
-    localStorage.setItem('savedCities', JSON.stringify(newCities))
-}
-
 const viewLocation = (location) => {
-  toast.success('Location Details Saved', {
-    position: 'top-right'
-  });
-
   const [city, state] = location.place_name.split(',')
-  addCity(location, city, state)
-
-
-  router.push({
-    name: 'location',
-    params: {state:state.trim(), city:city},
-    query: {
+  const locationObj = {
+    id: uid(),
+    city: city,
+    state: state,
+    coords: {
       lat: location.geometry.coordinates[1],
       lng: location.geometry.coordinates[0]
     }
-  })
+  };
+
+    if (savedLocations.value.length) {
+        const cityExists = savedLocations.value.find((c) => c.city === city) || null;
+
+        if (!cityExists) {
+          const newCities = [locationObj, ...savedLocations.value];
+          store.commit('setSavedLocations', newCities)
+
+          toast.success('Location Details Saved', {
+            position: 'top-right'
+          });
+        }
+
+        store.commit('setCoords', locationObj.coords)
+    } else {
+      store.commit('setSavedLocations', [locationObj])
+      store.commit('setCoords', locationObj.coords)
+
+      toast.success('Location Details Saved', {
+        position: 'top-right'
+      });
+    }
+
+    router.push({
+      name: 'location',
+      params: {name: city.trim()}
+    })
 }
 </script>
 

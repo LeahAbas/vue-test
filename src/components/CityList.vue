@@ -1,10 +1,10 @@
 <template>
     <p v-if="savedCity.length" class="heading">Your previous search result(s)</p>
-    <p v-else>
-        No locations added. Search to add a location.
+    <p v-else class="heading">
+        No locations saved. 
     </p>
 
-    <div class="cards-container">
+    <div v-if="savedCity" class="cards-container">
         <div v-for="city in savedCity" :key="city.id" @click="goToCity(city)" class="cards-container-box">
             <CityCard :city="city" />
         </div>
@@ -13,24 +13,21 @@
 
 <script setup>
 import CityCard from './CityCard.vue'
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import { useRouter } from "vue-router";
-import { weatherApi } from "../api/axios"
+import { weatherApi } from "../api/axios";
+import { store } from "../store";
 
 const apiKey = import.meta.env.VITE_WEATHER_API
-
-
-const router = useRouter()
 const savedCity = ref([])
+const router = useRouter()
+const savedLocations = computed(() => store.state.savedLocations)
 
 const getCities = async () => {
-    if (localStorage.getItem("savedCities")) {
-        savedCity.value = JSON.parse(
-            localStorage.getItem("savedCities")
-        );
+    if (savedLocations.value.length) {
 
         const requests = [];
-        savedCity.value.forEach((city) => {
+        savedLocations.value.forEach((city) => {
             requests.push(weatherApi.get(
                 `data/2.5/weather?lat=${city.coords.lat}&lon=${city.coords.lng}&appid=${apiKey}&units=metric`
             ));
@@ -38,26 +35,29 @@ const getCities = async () => {
 
         const weatherData = await Promise.all(requests);
 
-        await new Promise((res) => setTimeout(res, 1000))
-
         weatherData.forEach((value, index) => {
+            savedCity.value = savedLocations.value
+
             savedCity.value[index].weather = value.data;
         });
     }
 };
-await getCities()
+
+await getCities ()
 
 const goToCity = (city) => {
+    const coords = {
+        lat: city.coords.lat,
+        lng: city.coords.lng,
+    }
+
+    store.commit('setCoords', coords)
     router.push({
     name: "location",
-    params: { state: city.state, city: city.city },
-    query: {
-      id: city.id,
-      lat: city.coords.lat,
-      lng: city.coords.lng,
-    },
+    params: { name: city.city }
   });
 }
+
 
 </script>
 

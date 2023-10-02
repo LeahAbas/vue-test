@@ -1,13 +1,13 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { getWeatherReport, getCityWeather, getPastWeather } from "../api/requests"
-import { useRoute } from "vue-router";
+import { store } from "../store";
 import dayjs from "dayjs"
 
-    const route = useRoute();
     const showDetails = ref(false)
     const currentDate = dayjs()
     const timestamps = []
+    const coords = computed(() => store.state.coords)
 
     for (let i = 1; i <= 5; i++) {
         const previousDate = currentDate.subtract(i, 'day');
@@ -18,8 +18,8 @@ import dayjs from "dayjs"
     const getWeatherData = async () => {
         try {
             const [weather, temp] = await Promise.all([
-                getWeatherReport(route.query.lat, route.query.lng),
-                getCityWeather(route.query.lat, route.query.lng)
+                getWeatherReport(coords.value.lat, coords.value.lng),
+                getCityWeather(coords.value.lat, coords.value.lng)
             ]);
 
             return { weather, temp };
@@ -32,9 +32,8 @@ import dayjs from "dayjs"
         
         try {
            const req = timestamps.map((stamp) => {
-               return getPastWeather(route.query.lat, route.query.lng, stamp)
+               return getPastWeather(coords.value.lat, coords.value.lng, stamp)
            })
-
             const responses = await Promise.all(req)
             
             return responses
@@ -207,6 +206,11 @@ import dayjs from "dayjs"
         width: 7.5rem;
         margin-top: 0.94rem;
         font-size: 0.785rem;
+        transition: transform 0.4s ease;
+
+        &:hover {
+            transform: scale(1.1);
+        }
     }
 
     .details-box {
