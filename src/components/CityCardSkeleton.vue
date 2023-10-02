@@ -8,8 +8,6 @@
         <div class="loader-container">
             <div class="box" />
             <div class="box" />
-            <PageLoader class="max-w-[50px] w-full"/>
-            <PageLoader class="max-w-[75px] w-full"/>
         </div>
     </div>
 </template>
