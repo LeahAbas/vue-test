@@ -158,11 +158,11 @@ const viewLocation = (location) => {
     }
 
     &-box {
-      width: 100%;
-      height: 65vh;
+      width: 90%;
+      height: 35rem;
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1.5rem;
       border-radius: 2rem;
       background-color: rgba(255, 255, 255, 0.439);
       backdrop-filter: blur(20px);
@@ -256,7 +256,9 @@ const viewLocation = (location) => {
       }
 
       &-box {
-        width: 33rem;
+        gap: 0;
+        justify-content: space-between;
+        width: 30rem;
         border-radius: 2.5rem;
         padding: 2rem;
       }
@@ -286,13 +288,6 @@ const viewLocation = (location) => {
 
       &-city-list {
         font-size: 1rem;
-      }
-    }
-
-    @media screen  and (min-width: 1024px){
-      &-box {
-        gap: 0;
-        justify-content: space-between;
       }
     }
   }
