@@ -28,7 +28,6 @@ const getUserLocation = () => {
           
           if(data){
             search.value = data.features[0].properties.name
-            debouncedSearch()
           }
         }
 
