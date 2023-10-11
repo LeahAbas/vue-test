@@ -55,7 +55,7 @@ const debouncedSearch = debounce(async () => {
   } else {
     mapboxResult.value = null;
   }
-}, 300);
+}, 500);
 
 const viewLocation = (location) => {
   const [city, state] = location.place_name.split(',')
@@ -93,7 +93,7 @@ const viewLocation = (location) => {
 
     router.push({
       name: 'location',
-      params: {name: city.trim()}
+      params: {name: city.replace(' ', '')}
     })
 }
 </script>

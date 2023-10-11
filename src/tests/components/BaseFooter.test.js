@@ -12,6 +12,7 @@ describe('Renders the footer correctly', () => {
 
     test('renders the current year in the footer', () => {
     const currentYear = new Date().getFullYear();
+    
     expect(wrapper.text()).toContain(`© Weather-Advisor ${currentYear}`);
     });
 

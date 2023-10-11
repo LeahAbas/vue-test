@@ -100,7 +100,7 @@ import dayjs from "dayjs"
             <button @click="showDetails = !showDetails">{{showDetails ? "Hide" : "View more"}}</button>
 
             <Transition name="details">
-                <ul v-if="showDetails" class="details-box">
+                <ul v-show="showDetails" class="details-box">
                     <li v-for="(item, index) in details" :key="index">
                         <p>{{ item.title }}</p>
                         <h3>{{ item.value }}</h3>
@@ -127,7 +127,7 @@ import dayjs from "dayjs"
                     <div  v-for="item in pastReport" :key="item.current.dt" class="item-past">
                         <p>{{ dayjs.unix(item.current.dt).format("dddd") }}</p>
                         <span class="text-accentColor"> {{ Math.round(item.current.temp) }}&deg;C</span>
-                     </div>
+                    </div>
                 </div>
             </div>
         </div>
