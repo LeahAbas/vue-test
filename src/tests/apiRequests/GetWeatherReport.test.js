@@ -4,10 +4,10 @@ import MockAdapter from 'axios-mock-adapter';
 import { weatherApi } from "../../api/axios";
 
 const mock = new MockAdapter(weatherApi);
+
 describe('getWeatherReport', () => {
   it('fetches weather data successfully', async () => {
     const mockResponse = {
-
       current: {
         temp: 25,
       },

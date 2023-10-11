@@ -54,7 +54,7 @@ const goToCity = (city) => {
     store.commit('setCoords', coords)
     router.push({
     name: "location",
-    params: { name: city.city }
+    params: { name: city.city.replace(' ', '')}
   });
 }
 
